@@ -1,4 +1,4 @@
-#App's screenshots
+# App's screenshots
 #
 ![alt text](image.png)
 ![alt text](image-1.png)
