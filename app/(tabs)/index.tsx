@@ -1,70 +1,138 @@
-import { Image, StyleSheet, Platform } from 'react-native';
-
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { useState } from 'react';
+import {  StyleSheet, View, Text, TextInput, StatusBar } from 'react-native';
+import Button from "./Button";
 
 export default function HomeScreen() {
+  const [input, setInput] = useState("");
+  const calculate = () => {
+    let actualString = "";
+    for (let a of input) {
+      if (a === "x") actualString = actualString + "*"; 
+      else actualString += a;
+    }
+    const last = actualString.charAt(actualString.length - 1);
+    if (
+      last === "/" ||
+      last === "+" ||
+      last === "-" ||
+      last == "x" ||
+      last == "."
+    ) {
+      actualString = actualString.slice(0, actualString.length - 1);
+    }
+    const result = eval(actualString) + "";
+    setInput(result);
+  };
+  const addOperator = (op:any) => {
+    let exp = input;
+    const last = exp.charAt(exp.length - 1);
+    if (last === "x" || last === "+" || last === "-" || last === "/") {
+      exp = exp.slice(0, -1) + op;
+      setInput(exp);
+    } else {
+      exp = exp + op;
+      setInput(exp);
+    }
+  };
+
+  const clear = () => {
+    setInput(input.slice(0, input.length - 1));
+  };
+
+  const percentage = () => {
+    let exp = input;
+    let last = input.charAt(input.length - 1);
+    if (last === "/" || last === "x" || last === "-" || last === "+") {
+      exp = exp.slice(0, exp.length - 1);
+    }
+    setInput(eval(exp + "/100") + "");
+  };
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <View style={styles.container}>
+        <TextInput
+        maxLength={10}
+        value={input}
+        keyboardType="number-pad"
+        showSoftInputOnFocus={false}
+        style={styles.input}
+      />
+      <View style={styles.buttonContainer}>
+        <View style={styles.row}>
+          <Button onPress={() => setInput("")} backgroundColor="gold">
+            AC
+          </Button>
+          <Button onPress={clear} backgroundColor="gold">
+            C
+          </Button>
+          <Button onPress={percentage} backgroundColor="gold">
+            %
+          </Button>
+          <Button onPress={() => addOperator("/")} backgroundColor="#ffa31a">
+            /
+          </Button>
+        </View>
+        <View style={styles.row}>
+          <Button onPress={() => setInput(input + "7")}>7</Button>
+          <Button onPress={() => setInput(input + "8")}>8</Button>
+          <Button onPress={() => setInput(input + "9")}>9</Button>
+          <Button onPress={() => addOperator("x")} backgroundColor="#ffa31a">
+            X
+          </Button>
+        </View>
+        <View style={styles.row}>
+          <Button onPress={() => setInput(input + "4")}>4</Button>
+          <Button onPress={() => setInput(input + "5")}>5</Button>
+          <Button onPress={() => setInput(input + "6")}>6</Button>
+          <Button onPress={() => addOperator("-")} backgroundColor="#ffa31a">
+            -
+          </Button>
+        </View>
+        <View style={styles.row}>
+          <Button onPress={() => setInput(input + "1")}>1</Button>
+          <Button onPress={() => setInput(input + "2")}>2</Button>
+          <Button onPress={() => setInput(input + "3")}>3</Button>
+          <Button onPress={() => addOperator("+")} backgroundColor="#ffa31a">
+            +
+          </Button>
+        </View>
+        <View style={styles.row}>
+          <Button onPress={() => setInput(input + "0")} width={160}>
+            0
+          </Button>
+          <Button onPress={() => setInput(input + ".")}>.</Button>
+
+          <Button onPress={calculate} backgroundColor="#ffa31a">
+            =
+          </Button>
+        </View>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  buttonContainer: {
+    flexDirection: "column",
+    justifyContent: "space-around",
+    flex: 1,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  container: {
+    flex: 1,
+    padding: 20,
+    paddingTop: StatusBar.currentHeight + 20,
+    width: "100%",
+    backgroundColor: "white"
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  input: {
+    width: "100%",
+    height: "30%",
+    fontSize: 75,
+    textAlign: "right",
+    color: "black",
+    fontWeight: "300",
+  },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-around",
   },
 });
